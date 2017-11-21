@@ -27,13 +27,13 @@ typedef enum
     GUI_E_CHOSEN = 0x00000004,                  /**< is active element      */
     GUI_E_MOVABLE = 0x00000008,                 /**< is element movable     */
     GUI_E_PARENT_CONNECTED = 0x00000010,        /**< is connected to parent while moving parent */
-    GUI_E_HASNOT_RES = 0x00000020,                 /**< */
-    GUI_WINDOW_MINIMIZED = 0x00000040,          /**< */
-    GUI_WINDOW_MAXIMIZED = 0x00000080,          /**< */
-    GUI_WINDOW_INPUT_GRABBED = 0x00000100,      /**< */
-    GUI_WINDOW_INPUT_FOCUS = 0x00000200,        /**< */
-    GUI_WINDOW_MOUSE_FOCUS = 0x00000400,        /**< */
-    GUI_WINDOW_FOREIGN = 0x00000800,            /**< */
+    GUI_E_HASNOT_RES = 0x00000020,              /**< */
+    GUI_E_MINIMIZED = 0x00000040,               /**< */
+    GUI_E_MAXIMIZED = 0x00000080,               /**< */
+    GUI_E_INPUT_GRABBED = 0x00000100,           /**< */
+    GUI_E_INPUT_FOCUS = 0x00000200,             /**< */
+    GUI_E_MOUSE_FOCUS = 0x00000400,             /**< */
+    GUI_E_FOREIGN = 0x00000800,                 /**< */
     GUI_E_VALID = 0x00002000                    /**< */
 } GUI_ElementsFlags;
 
@@ -64,11 +64,16 @@ typedef struct GUIElem
 
 typedef struct
 {
-    char stages[255];
-    char delimeter;
+    char strings[10][20];
+    int nStrings;
     int stage;
-} LabelExtension;
+} GUI_LabelExtension;
 
+char* getLabelExtText(GUIElem* pLbl);
+GUI_LabelExtension* getPLabelExt(GUIElem* pLbl);
+
+void leftArrowClick(GUIElem* pLBtn);
+void rightArrowClick(GUIElem* pRBtn);
 // Container struct for GUI elements
 typedef struct
 {

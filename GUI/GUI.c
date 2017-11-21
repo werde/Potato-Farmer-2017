@@ -6,7 +6,7 @@ GUIElem* makeButton();
 GUIElem* makeTab();
 GUIElem* makeTabContainer();
 GUIElem* makeSpinner();
-void setLabelExtensionText(LabelExtension*, char*);
+void setLabelExtensionText(GUI_LabelExtension*, char*);
 
 GUIElem* makeGUIElem(GUIElementsTypes type)
 {
@@ -84,17 +84,49 @@ GUIElem* makeLabel()
     e->flags |= GUI_E_MOVABLE | GUI_E_PARENT_CONNECTED | GUI_E_INTERACTIVE;
 
     // Label extension
-    LabelExtension* lExt = malloc(sizeof(LabelExtension));
-    lExt->delimeter = ';';
+    GUI_LabelExtension* lExt = malloc(sizeof(GUI_LabelExtension));
     lExt->stage = 0;
+    lExt->nStrings = 0;
     e->pExtension = lExt;
 
     return e;
 }
 
-void setLabelExtensionText(LabelExtension* pLblExt, char* text)
+void setLabelExtensionText(GUI_LabelExtension* pLblExt, char* text)
 {
-    strcpy(pLblExt->stages, text);
+    //strcpy(pLblExt->stages, text);
+};
+
+char* getLabelExtText(GUIElem* pLbl)
+{
+    GUI_LabelExtension* pLExt = (GUI_LabelExtension*) pLbl->pExtension;
+
+    return pLExt->strings[pLExt->stage];
+};
+
+GUI_LabelExtension* getPLabelExt(GUIElem* pLbl)
+{
+   return (GUI_LabelExtension*) pLbl->pExtension;
+};
+
+void leftArrowClick(GUIElem* pLBtn)
+{
+    GUIElem* pSpin = pLBtn->pParent;
+    if (pSpin->type != GUI_SPINNER) return;
+
+    GUI_LabelExtension* pLExt = getPLabelExt(pSpin->pChildren[1]);
+
+    if (pLExt->stage > 0) pLExt->stage--;
+};
+
+void rightArrowClick(GUIElem* pRBtn)
+{
+    GUIElem* pSpin = pRBtn->pParent;
+    if (pSpin->type != GUI_SPINNER) return;
+
+    GUI_LabelExtension* pLExt = getPLabelExt(pSpin->pChildren[1]);
+
+    if (pLExt->stage < pLExt->nStrings - 1) pLExt->stage++;
 };
 
 void setGUIRes(GUIElem* e, GUIResource* res)
@@ -170,18 +202,29 @@ void initSpinner(GUI* gui, GUIElem* sp)
     strcpy(left->resTag, "left");
     setCoords(left, sp->coords.x + sp->coords.w + 10, sp->coords.y, 50, 50);
     setParent(sp, left);
+    left->click = leftArrowClick;
+
 
     GUIElem* label = makeLabel();
     label = pushBackElem(gui, label);
     strcpy(label->resTag, "blank");
     setCoords(label, left->coords.x + left->coords.w + 10, sp->coords.y, 200, 50);
     setParent(sp, label);
+    //label->flags = left->flags & (sp->flags & GUI_E_VISIBLE);
 
     GUIElem* right = makeButton();
     right = pushBackElem(gui, right);
     strcpy(right->resTag, "right");
     setCoords(right, label->coords.x + label->coords.w + 10, sp->coords.y, 50, 50);
     setParent(sp, right);
+    right->click = rightArrowClick;
+
+    if (!(sp->flags & GUI_E_VISIBLE))
+    {
+        left->flags = left->flags & ~GUI_E_VISIBLE;
+        label->flags = label->flags & ~GUI_E_VISIBLE;
+        right->flags = right->flags & ~GUI_E_VISIBLE;
+    }
 }
 
 GUIElem* makeTabContainer()
@@ -299,7 +342,7 @@ void testButtonFunc(GUIElem* btn)
     printf("testButtonFunc\n");
     if ((btn->pChildren[0]->flags & GUI_E_VALID) && (btn->pChildren[0]->type == GUI_LABEL))
     {
-        LabelExtension* pLblExt = (LabelExtension*) btn->pChildren[0]->pExtension;
+        GUI_LabelExtension* pLblExt = (GUI_LabelExtension*) btn->pChildren[0]->pExtension;
         pLblExt->stage += 1;
     }
 }

@@ -8,6 +8,7 @@ int initSDL(Settings* s)
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return 1;
     };
+    TTF_Init();
 
     if (SDL_CreateWindowAndRenderer(s->width, s->height, s->window_flags, &window, &renderer))
     {

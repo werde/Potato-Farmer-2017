@@ -56,8 +56,8 @@ void handleEvent(GUI* gui, SDL_Event* ev)
             printf("clicked on %s\n", e->tag);
             if (e->pExtension && (e->type == GUI_LABEL))
             {
-                LabelExtension* pLE = (LabelExtension*) e->pExtension;
-                printf("stage #%d -- %s\n", pLE->stage, pLE->stages);
+                GUI_LabelExtension* pLE = (GUI_LabelExtension*) e->pExtension;
+                printf("stage #%d -- %s\n", pLE->stage, pLE->strings[0]);
             }
             handleClick(gui, e, ev);
         }
@@ -85,4 +85,31 @@ void drawElem(GUIElem* e)
 {
     if (e->flags & GUI_E_HASNOT_RES) return;
     SDL_RenderCopy(renderer, e->res->spr->tex, &(e->res->spr->sources[0]), (SDL_Rect*) &e->coords);
+
+    if (e->type == GUI_LABEL)
+    {
+        printText(e->res->spr->tex, getLabelExtText(e), &e->coords);
+    }
 };
+
+void printText(SDL_Texture* t, const char* text, SDL_Rect* rect)
+{
+    TTF_Font* font = TTF_OpenFont("./assets/ahronbd.ttf", 18);
+    if (font == NULL) printf("NULL font %s\n", TTF_GetError());
+
+    SDL_Color colour = {255, 255, 0};
+
+    SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, text, colour);
+
+    SDL_Texture* mes = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+    SDL_Rect Message_rect; //create a rect
+    Message_rect.x = 0;  //controls the rect's x coordinate
+    Message_rect.y = 0; // controls the rect's y coordinte
+    Message_rect.w = 100; // controls the width of the rect
+    Message_rect.h = 100; // controls the height of the rect
+
+    SDL_RenderCopy(renderer, mes, NULL, rect);
+}
+
+

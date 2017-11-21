@@ -53,10 +53,15 @@ GUIElem* eatElem(GUI* gui, FILE* f)
 
     GUIElem* pCurEl = pushBackElem(gui, pEl);
 
+    readFlags(f, pCurEl);
+
     switch(type)
     {
     case GUI_SPINNER:
         initSpinner(gui, pCurEl);
+
+        int wordsRead = readStrings(f, getPLabelExt(pCurEl->pChildren[1])->strings);
+        getPLabelExt(pCurEl->pChildren[1])->nStrings = wordsRead;
         break;
     }
 
@@ -76,6 +81,48 @@ int eatRightArrow(FILE* f)
     }
     ungetc(tChar, f);
     printf("%d %d\n", i, tChar);
+    return i;
+}
+
+int readStrings(FILE* f, char str[10][20])
+{
+    int i = 0;
+    printf("  %s", str[i]);
+    char tChar = ' ';
+    while ((tChar = fgetc(f)) && (tChar != '\n'))
+    {
+        ungetc(tChar, f);
+        fscanf(f, "%s", str[i]);
+        printf("%s", str[i]);
+        i++;
+    }
+    ungetc(tChar, f);
+
+    return i;
+}
+
+int readFlags(FILE* f, GUIElem* e)
+{
+    int i = 0;
+    char tChar = fgetc(f);
+    if (tChar != '[')
+    {
+        ungetc(tChar, f);
+        return;
+    }
+    while ((tChar = fgetc(f)) && (tChar != ']') && (tChar != '\n'))
+    {
+        int visibility = 1;
+        ungetc(tChar, f);
+        fscanf(f, "%d", &visibility);
+
+        if (visibility == 0)
+        {
+            e->flags = e->flags & ~GUI_E_VISIBLE;
+        }
+    }
+    if (tChar != ']') ungetc(tChar, f);
+
     return i;
 }
 

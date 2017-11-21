@@ -2,6 +2,7 @@
 #define GUIADAPTER_H_INCLUDED
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "GUI.h"
 #include "../grafix.h"
